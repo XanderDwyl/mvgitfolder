@@ -1,0 +1,22 @@
+{
+  "name": "mvgitfolder",
+  "version": "1.0.0",
+  "description": "This will copy recursively the files that are going to commit in github folder. Copy from files until the root folder, same location and files. ",
+  "main": "index.js",
+  "dependencies": {
+    "colors": "~0.6.2",
+    "fs-extra": "^0.18.0",
+    "yargs": "~1.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "github",
+    "copy",
+    "folder"
+  ],
+  "author": "Alexjander T. Bacalso",
+  "license": "MIT"
+}
