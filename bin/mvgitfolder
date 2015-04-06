@@ -1,21 +1,17 @@
 #!/usr/bin/env node
 
 'use strict';
-var fs      = require('fs-extra'),
-	path    = require('path'),
-	colors  = require('colors'),
-	yargs   = require('yargs'),
+var fs     = require('fs-extra'),
+	path   = require('path'),
+	colors = require('colors'),
+	yargs  = require('yargs'),
+	spawn  = require('child_process'),
 
-	aliases = [ '-a', '--add',  '-d', '--delete', '-v', '--verbose', '-c', '--copy' ],
 
 	argv = yargs
 		.usage('\nUsage: ' + process.argv[1].split('/').pop() + ' [options]')
-		.alias('a', 'add')
-		.describe('a', 'add data path to memory file, usually if memory file is not found - it will create one for you.')
-		.alias('d', 'delete')
-		.describe('d', 'clear the memory file')
-		.alias('c', 'copy')
-		.describe('c', 'copy files into specific path')
+		.alias('s', 'status')
+		.describe('s', 'get modified files and copy to specific location')
 		.alias('v', 'verbose')
 		.describe('v', 'print debugging message')
 		.boolean('h')
@@ -23,112 +19,40 @@ var fs      = require('fs-extra'),
 		.describe('h', 'Help ')
 		.argv,
 
-	files = [],
-
-
-setValidDir = function ( dir ) {
-
-	try {
-		process.chdir( dir );
-	}
-	catch (err) {
-		dir = process.cwd();
-	}
-
-	return dir;
-},
-
-createMemory = function ( dir ) {
-
-	dir = setValidDir( dir );
-	fs.writeFile(dir + '/memory', '', function(err) {
-		if(err) {
-			return console.log(err);
+getModifiedFiles = function( pathToSave ) {
+	spawn.exec('git status -s', function (error, stdout, stderr) {
+		var readyToCommit = stdout.split('\n');
+		if (error !== null) {
+			console.log('exec error: ' + error);
 		}
 
-		console.log("Memory File was created!");
-	});
-},
-
-addToMemory = function ( path ) {
-
-	if (!fs.existsSync(path)) {
-		console.log( 'Path not found or undefined' );
-		console.log(yargs.help());
-	} else {
-
-		if (!fs.existsSync('memory')) {
-			console.log( '+++++++++++++++++++++++++' );
-			console.log( '| Creating Memory file! |' );
-			console.log( '+++++++++++++++++++++++++' );
-			console.log( '' );
-			createMemory( process.cwd() );
+		if( typeof(pathToSave) === 'boolean' ) {
+			console.log('\nUndefined path to save.'.red);
+			console.log(yargs.help());
+			return;
 		}
 
-		fs.appendFile('memory', path + '\n', function(err) {
-			if(err) {
-				return console.log(err);
-			}
+		console.log( 'Processing the files to copy ...'.green );
+		readyToCommit.forEach( function ( file ) {
+			file = file.replace(/\w\s/, '').trim();
 
-			console.log("Added: " + path);
-		});
-	}
-},
-
-initMemory = function () {
-	console.log( '++++++++++++++++++++++++++' );
-	console.log( '| Clear the Memory file! |' );
-	console.log( '++++++++++++++++++++++++++' );
-
-	if (fs.existsSync('memory')) {
-		fs.unlinkSync('memory');
-	}
-
-	fs.writeFile('memory', '', function(err) {
-		if(err) {
-			return console.log(err);
-		}
-	});
-
-},
-
-getFilesinMemory = function (pathToSave) {
-	fs.readFile("memory", "utf8", function (error, data) {
-		if(error) throw error;
-		var loc = 0;
-		var filePath = data.toString().split("\n");
-
-
-		for(loc in filePath) {
-			if( filePath[ loc ].length > 0 ) {
-				fs.copy(filePath[ loc ], pathToSave + '/' + filePath[ loc ], function (err) {
+			if( file && fs.existsSync(file) ) {
+				fs.copy(file, pathToSave + '/' + file, function (err) {
 					if (err) {
 						console.error(err);
 					} else {
-						console.log("Successfully copied to " + pathToSave + '/' + filePath[ loc ]);
+						console.log("Successfully copied to " + pathToSave + '/' + file);
 					}
 				} );
 			}
-		}
-
-	});
+		} );
+	} );
 };
 
-var pArgv = process.argv.slice(2)[0];
-
-if (argv.h || aliases.indexOf(pArgv) < 0 ) {
+if (argv.h || !argv.s ) {
 	console.log(yargs.help());
 	return;
 }
 
-if (argv.d) {
-	initMemory();
-}
 
-if (argv.a) {
-	addToMemory(argv.a);
-}
-
-if (argv.p) {
-	getFilesinMemory(argv.p);
-}
+getModifiedFiles(argv.s);

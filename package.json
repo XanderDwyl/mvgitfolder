@@ -1,7 +1,7 @@
 {
   "name": "mvgitfolder",
-  "version": "1.0.2",
-  "description": "This will copy recursively the files unto specific location or path. ",
+  "version": "1.0.3",
+  "description": "This will copy recursively the files unto specific location or path. e.g: Works only in a git folder structure.",
   "bin": {
     "mvgitfolder": "./bin/mvgitfolder"
   },

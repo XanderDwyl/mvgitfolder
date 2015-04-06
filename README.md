@@ -1,6 +1,7 @@
 ## MVGitFolder
 ---
 This will copy recursively the files unto specific location or path.
+NOTE: Works only in a git folder structure.
 
 ### Usage: mvgitfolder [options]
 ```
@@ -16,11 +17,8 @@ $ mvgitfolder --help
 
 ### Options:
 ```
-  -a, --add      add data path to memory file, usually if memory file is
-                 not found - it will create one for you.
-  -d, --delete   clear the memory file
-  -c, --copy     copy files into specific path
-  -v, --verbose  print debugging message
-  -h, --help     Help
+	-s, --status   get modified files and copy to specific location
+	-v, --verbose  print debugging message
+	-h, --help     Help
 
 ```
