@@ -6,16 +6,16 @@ var fs      = require('fs-extra'),
 	colors  = require('colors'),
 	yargs   = require('yargs'),
 
-	aliases = [ '-a', '--add',  '-c', '--clear', '-v', '--verbose', '-p', '--process' ],
+	aliases = [ '-a', '--add',  '-d', '--delete', '-v', '--verbose', '-c', '--copy' ],
 
 	argv = yargs
 		.usage('\nUsage: ' + process.argv[1].split('/').pop() + ' [options]')
 		.alias('a', 'add')
 		.describe('a', 'add data path to memory file, usually if memory file is not found - it will create one for you.')
-		.alias('c', 'clear')
-		.describe('c', 'clear the memory file')
-		.alias('p', 'process')
-		.describe('p', 'get files in memory file')
+		.alias('d', 'delete')
+		.describe('d', 'clear the memory file')
+		.alias('c', 'copy')
+		.describe('c', 'copy files into specific path')
 		.alias('v', 'verbose')
 		.describe('v', 'print debugging message')
 		.boolean('h')
@@ -95,17 +95,17 @@ initMemory = function () {
 getFilesinMemory = function (pathToSave) {
 	fs.readFile("memory", "utf8", function (error, data) {
 		if(error) throw error;
-		var iterator  = 0;
-		var array     = data.toString().split("\n");
-		var createDir = '';
+		var loc = 0;
+		var filePath = data.toString().split("\n");
 
-		for(iterator in array) {
-			if( array[ iterator ].length > 0 ) {
-				fs.copy(array[ iterator ], pathToSave + '/' + array[ iterator ], function (err) {
+
+		for(loc in filePath) {
+			if( filePath[ loc ].length > 0 ) {
+				fs.copy(filePath[ loc ], pathToSave + '/' + filePath[ loc ], function (err) {
 					if (err) {
 						console.error(err);
 					} else {
-						console.log("Successfully copied to " + pathToSave + '/' + array[ iterator ]);
+						console.log("Successfully copied to " + pathToSave + '/' + filePath[ loc ]);
 					}
 				} );
 			}
@@ -121,7 +121,7 @@ if (argv.h || aliases.indexOf(pArgv) < 0 ) {
 	return;
 }
 
-if (argv.c) {
+if (argv.d) {
 	initMemory();
 }
 

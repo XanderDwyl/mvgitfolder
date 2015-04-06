@@ -2,7 +2,9 @@
   "name": "mvgitfolder",
   "version": "1.0.2",
   "description": "This will copy recursively the files unto specific location or path. ",
-  "main": "index.js",
+  "bin": {
+    "mvgitfolder": "./bin/mvgitfolder"
+  },
   "dependencies": {
     "colors": "~0.6.2",
     "fs-extra": "^0.18.0",
